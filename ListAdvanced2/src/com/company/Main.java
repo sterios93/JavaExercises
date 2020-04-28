@@ -12,6 +12,97 @@ public class Main {
 
     }
 
+    public void coursePlanner() {
+        // *SoftUni Course Planning
+        // You are tasked to help plan the next Programing Fundamentals course by keeping track of the lessons,
+        // that are going to be included in the course, as well as all the exercises for the lessons.
+        // On the first input line you will receive the initial schedule of lessons and exercises that are going to be part of the next course,
+        // separated by comma and space ", ". But before the course starts, there are some changes to be made.
+        // Until you receive "course start" you will be given some commands to modify the course schedule. The possible commands are:
+        // Add:{lessonTitle} - add the lesson to the end of the schedule, if it does not exist
+        // Insert:{lessonTitle}:{index} -insert the lesson to the given index, if it does not exist
+        // Remove:{lessonTitle} -remove the lesson, if it exists
+        // Swap:{lessonTitle}:{lessonTitle} -change the place of the two lessons, if they exist
+        // Exercise:{lessonTitle} -add Exercise in the schedule right after the lesson index,
+        // if the lesson exists and there is no exercise already, in the following format "{lessonTitle}-Exercise".
+        // If the lesson doesn't exist, add the lesson in the end of the course schedule, followed by the Exercise.
+        // Each time you Swap or Remove a lesson, you should do the same with the Exercises, if there are any, which follow the lessons.
+
+
+        Scanner sc = new Scanner(System.in);
+        List<String> courses = Arrays.stream(sc.nextLine().split(", ")).collect(Collectors.toList());
+
+        while(true) {
+            String line = sc.nextLine();
+
+            boolean isStarting = line.equals("course start");
+            if (isStarting) {
+                for (String course : courses) {
+                    System.out.print(course + " ");
+                }
+                break;
+            }
+
+            String[] commands = line.split(":");
+            String command = commands[0];
+            String title = commands[1];
+
+            switch (command) {
+                case "Add":
+                    if (!courses.contains(title)) courses.add(title);
+                    break;
+                case "Insert":
+                    int insertedIndex = Integer.parseInt(commands[2]);
+                    if (!courses.contains(title)) courses.add(insertedIndex, title);
+                    break;
+                case "Remove":
+                    int indexToRemove = courses.indexOf(title);
+                    if (indexToRemove > 0) {
+                        courses.remove(indexToRemove);
+                    }
+                    break;
+                case "Swap":
+                    String secondTitle = commands[2];
+                    if (courses.contains(title) && courses.contains(secondTitle)) {
+                        int indexA = courses.indexOf(title);
+                        int indexB = courses.indexOf(secondTitle);
+
+                        boolean indexAExerciseOutOfBounds = (indexA + 1) > courses.size() - 1;
+                        boolean indexBExerciseOutOfBounds = (indexB + 1) > courses.size() - 1;
+                        boolean indexAExercise = !indexAExerciseOutOfBounds && courses.get(indexA + 1).equals("Exercise");
+                        boolean indexBExercise = !indexBExerciseOutOfBounds && courses.get(indexB + 1).equals("Exercise");
+
+                        courses.set(indexA, secondTitle);
+                        courses.set(indexB, title);
+                        if (indexAExercise) {
+                            courses.add(indexB + 1, "Exercise");
+                            courses.remove(indexA + 1);
+                        }
+                        if (indexBExercise) {
+                            courses.remove(indexB + 1);
+                            courses.add(indexA + 1, "Exercise");
+                        }
+                    }
+                    break;
+                case "Exercise":
+                    int titleIndex = courses.indexOf(title);
+                    String nextItem = courses.get(titleIndex + 1);
+
+                    if (!courses.contains(title)) {
+                        courses.add(title);
+                        courses.add("Exercise");
+                    } else if (courses.contains(title) && !nextItem.equals("Exercise")) {
+                        courses.add(titleIndex, "Exercise");
+                    }
+
+
+                    break;
+            }
+
+
+        }
+    }
+
     public void listOperations() {
         // You will be given numbers (list of integers) on the first input line.
         //  Until you receive "End" you will be given operations you have to apply on the list. The possible commands are:
